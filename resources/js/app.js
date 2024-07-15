@@ -1,4 +1,5 @@
 import './bootstrap';
+import { createPinia } from 'pinia';
 
 import Alpine from 'alpinejs';
 
@@ -11,4 +12,4 @@ Alpine.start();
 import { createApp } from 'vue';
 import App from './App.vue';
 
-createApp(App).mount('#chatApp')
+createApp(App).use(createPinia()).mount('#chatApp')
