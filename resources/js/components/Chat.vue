@@ -1,11 +1,11 @@
 <script setup>
-import {ref,} from 'vue';
+import {ref, onMounted, watch, reactive, computed} from 'vue';
 import axios from 'axios';
 import ThreeDotIcon from './ThreeDotIcon.vue';
-import {useAuthUser} from './../stores/useAuthUser.js';
-import  useLocalStorage  from './../composables/useLocalStorage.js'
 
 const user = ref({});
+const chats  = reactive({});
+const typing  = ref('');
 const message  = ref('');
 const authUser = JSON.parse(window.localStorage.getItem('authUser'));
 const props = defineProps(['user']);
@@ -18,10 +18,49 @@ const closeChat = (e) =>{
     e.preventDefault();
     emit('isChatOpen', false);
 }
+
+
 //Websociket Listen
-Echo.private('chat.' + authUser.id)
+
+/* 
+    Join in a one single Channel
+    Echo.join('chat.1')
+    .here((users) =>{
+        console.log(users);
+    })
+*/
+
+/*
+    Typing User
+*/
+    const channel = Echo.private('app')
+
+
+    channel.listenForWhisper('typing', (event) => {
+        if(event.id == user.value.id){
+            typing.value = "Typing..."
+        }
+    });
+    channel.listenForWhisper('typingEnd', (event) => {
+        if(event.id == user.value.id){
+            typing.value = '';
+        }
+    });
+
+    const handleFocus = (e) => {
+        channel.whisper('typing', {
+            'id': authUser.id,
+        })
+    };
+    const handleFocusOut = (e) => {
+        channel.whisper('typingEnd', {
+            'id': authUser.id,
+        })
+    };
+
+    Echo.private('chat.' + user.value.id)
     .listen('MessageSend', (event) => {
-        console.log(event.chat.message);
+        chats.value.unshift(event.chat);
     });
 
 //Send message Handle
@@ -34,6 +73,7 @@ const handleSend = (e) => {
             'message' : message.value,
             'authUser':  authUser.id,
         }).then((res) => {
+            chats.value.unshift(res.data);
             message.value = '';
             btnDisable.value = false;
         }).catch((error) => {
@@ -45,12 +85,34 @@ const handleSend = (e) => {
 
 
 
-
-
 //Image Link
 function fileLink() {
     return 'https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=50';
 }
+
+
+watch( () => props.user, async (newUser) => {
+    chats.value = [];
+    user.value = newUser;
+    await axios.get('/chat/' + authUser.id + '/' + user.value.id ).then((res) => {
+        chats.value = res.data;
+    })
+    console.log(chats);
+}, {deep:true})
+
+
+onMounted(async () => {
+    await axios.get('/chat/' + authUser.id + '/' + user.value.id ).then((res) => {
+        chats.value = res.data;
+    })
+})
+
+
+const getTime = (time) => {
+    const date = new Date(time)
+    return date.toLocaleTimeString([], { year: "numeric",  month: "long",  day: "numeric", hour: 'numeric', minute: 'numeric', hour12: true });
+}
+
 </script>
 <template>
 <!-- Chat Header-->
@@ -59,7 +121,7 @@ function fileLink() {
         <img class="rounded-full w-12 h-12 border-2 border-white" :src="fileLink()">
         <div class="ml-3">
             <p class="font-semibold">{{ props.user.name }}</p>
-            <p class="text-gray-500 text-xs">Hellow</p>
+            <p class="text-gray-500 text-xs">Friend</p>
         </div>
     </div>
     <div class="relative inline-block text-left group">
@@ -74,26 +136,40 @@ function fileLink() {
     </div>
     <!-- Chat Body-->
     <div class="overflow-y-auto max-h-64 min-h-[19rem] px-4 flex flex-col-reverse">
-    <div class="flex items-center space-x-1 mb-2">
-        <img class="rounded-full w-6 h-6 border-2 border-white" :src="fileLink()">
-        <div class="relative group text-sm p-2 shadow bg-white rounded-md max-w-xs">
-            Lorem, ipsum dolor sit amet consectetur 
-            <div class="absolute top-1/2 -translate-y-1/2 left-full ml-1 rounded bg-gray-600 py-1 px-1.5 z-50 text-white hidden group-hover:block w-max">12:00</div>
+        <div v-if="chats" v-for="chat in chats.value">
+            <div v-if="authUser.id == chat.sender_id" class="flex items-center justify-end space-x-1 mb-2">
+                <ThreeDotIcon class="w-4 h-4 cursor-pointer"></ThreeDotIcon>
+                <div class="relative group text-sm p-2 shadow bg-indigo-100 rounded-md max-w-xs">
+                    {{ chat.message }}
+                    <div class="absolute top-1/2 -translate-y-1/2 right-full mr-1 rounded bg-gray-600 py-1 px-1.5 z-50 text-white hidden group-hover:block w-max">{{  getTime(chat.created_at) }}</div>
+                </div>
+                <img class="rounded-full w-6 h-6 border-2 border-white" :src="fileLink()">
+            </div>
+            <div v-else class="flex items-center space-x-1 mb-2">
+                <img class="rounded-full w-6 h-6 border-2 border-white" :src="fileLink()">
+                <div class="relative group text-sm p-2 shadow bg-white rounded-md max-w-xs">
+                    {{ chat.message }}
+                    <div class="absolute top-1/2 -translate-y-1/2 left-full ml-1 rounded bg-gray-600 py-1 px-1.5 z-50 text-white hidden group-hover:block w-max">{{ getTime(chat.created_at) }}</div>
+                </div>
+                <ThreeDotIcon class="w-4 h-4 cursor-pointer"></ThreeDotIcon>
+            </div>
         </div>
-        <ThreeDotIcon class="w-4 h-4 cursor-pointer"></ThreeDotIcon>
-    </div>
-    <div class="flex items-center justify-end space-x-1 mb-2">
-        <ThreeDotIcon class="w-4 h-4 cursor-pointer"></ThreeDotIcon>
-        <div class="relative group text-sm p-2 shadow bg-indigo-100 rounded-md max-w-xs">
-            Lorem, ipsum dolor sit amet consectetur 
-            <div class="absolute top-1/2 -translate-y-1/2 right-full mr-1 rounded bg-gray-600 py-1 px-1.5 z-50 text-white hidden group-hover:block w-max">Lorem ipsum dolor sit amet consectetur</div>
+        <div v-else class="overflow-y-auto max-h-64 min-h-[19rem] px-4 flex flex-col-reverse">
+            <div class="text-center bg-blue-200 mx-auto px-2 py-1 rounded-lg text-xs">Send a Message</div>
         </div>
-        <img class="rounded-full w-6 h-6 border-2 border-white" :src="fileLink()">
     </div>
-    </div>
+    
     <!-- Chat Footer-->
     <div class="flex items-center bg-white rounded-bl-md rounded-br-md p-4">
-        <input type="text" v-model="message" placeholder="Type you message here..." class="w-full p-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400">
+        <div class="w-full relative">
+            <input type="text" @focus="handleFocus" @focusout="handleFocusOut" v-model="message" @keyup.enter="handleSend" placeholder="Type you message here..." class="w-full p-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400">
+            
+            <div v-if="typing" class="absolute">
+                <span class=" animate-pulse text-[12px] ml-2 text-green-500 ">Typing...</span>
+            </div>
+        </div>
         <button @click="handleSend" :disabled="btnDisable" class="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-700 ml-2">Send</button>
+        
     </div>
+    
 </template>

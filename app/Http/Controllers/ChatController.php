@@ -15,6 +15,13 @@ class ChatController extends Controller
         return view('chat.index');
     }
 
+    public function getUserChat(User $sender, User $receiver)
+    {
+        $chats = Chat::whereIn('sender_id', [$sender->id, $receiver->id])->whereIn('receiver_id', [$receiver->id, $sender->id])->orderBy('id','desc')->get();
+        
+        return response()->json($chats);
+    }
+
     public function sendMessage(Request $request)
     {
         $receiver = User::find($request->receiver_id);
@@ -27,5 +34,7 @@ class ChatController extends Controller
 
         // Broadcast the event for Send Message
         broadcast(new MessageSend($sender, $chat));
+
+        return response()->json($chat);
     }
 }

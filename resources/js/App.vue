@@ -57,7 +57,7 @@ onMounted( async () => {
     //WebSockit Listen
     Echo.private('chat.'+ authUser.value.id)
         .listen('MessageSend', (event) => {
-            console.log(event.chat.message);
+            // console.log(event.chat.message);
         });
 });
 
@@ -72,7 +72,7 @@ onMounted( async () => {
                 <div class="flex items-center justify-between">
                     <div class="flex items-center justify-between">
                         <img class="rounded-full w-12 h-12 border-2 border-blue-400" :src="fileLink()">
-                        <span class="font-semibold text-xl pl-1">Jibon Sutradhar</span>
+                        <span class="font-semibold text-xl pl-1">{{ authUser.name }}</span>
                     </div>
                     <div class="relative inline-block text-left group">
                         <ThreeDotIcon class="w-6 h-6 cursor-pointer"></ThreeDotIcon>
@@ -103,16 +103,16 @@ onMounted( async () => {
             <!--Chat List-->
             <div class="max-h-96 overflow-y-auto" >
                 <div v-for="user in filterUsers" :key="user.id" @click="handleUser(user)" class="flex p-2 items-center mb-3 mr-2 cursor-pointer bg-gray-100 hover:border hover:border-blue-200 rounded-md">
-                    <div class="relative">
-                        <img class="rounded-full w-12 h-12" :src="fileLink()">
+                    <div class="relative shrink">
+                        <img class="rounded-full w-8 h-8 md:w-12 md:h-12" :src="fileLink()">
                         <div class="absolute w-3 h-3 bg-slate-400 rounded-full top-0"></div>
                     </div>
-                    <div class="ml-3">
-                        <p class="font-semibold">{{ user.name }}</p>
+                    <div class="ml-3 grow">
+                        <p class="font-semibold text-sm md:text-md">{{ user.name }}</p>
                         <p class="text-gray-500 text-xs">Hello</p>
                     </div>
                 </div>
-                <div class="flex p-2 items-center mb-3 cursor-pointer hover:bg-gray-100 rounded-md">
+                <!-- <div class="flex p-2 items-center mb-3 cursor-pointer hover:bg-gray-100 rounded-md">
                     <div class="relative">
                         <img class="rounded-full w-12 h-12" :src="fileLink()">
                         <div class="absolute w-3 h-3 bg-green-400 rounded-full top-0"></div>
@@ -121,7 +121,7 @@ onMounted( async () => {
                         <p class="font-semibold">Sobuj</p>
                         <p class="text-gray-500 text-xs">Hellow</p>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
