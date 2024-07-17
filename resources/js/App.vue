@@ -61,6 +61,7 @@ onMounted( async () => {
         });
 });
 
+
 </script>
 
 <template>
@@ -102,14 +103,14 @@ onMounted( async () => {
             </div>
             <!--Chat List-->
             <div class="max-h-96 overflow-y-auto" >
-                <div v-for="user in filterUsers" :key="user.id" @click="handleUser(user)" class="flex p-2 items-center mb-3 mr-2 cursor-pointer bg-gray-100 hover:border hover:border-blue-200 rounded-md">
+                <div v-for="user in filterUsers" :key="user.id" @click="handleUser(user)" class="flex p-2 items-center mb-3 mr-2 cursor-pointer hover:border hover:border-blue-200 rounded-md" :class="chatUser.id == user.id ? ' bg-blue-100': 'bg-gray-100'">
                     <div class="relative shrink">
                         <img class="rounded-full w-8 h-8 md:w-12 md:h-12" :src="fileLink()">
                         <div class="absolute w-3 h-3 bg-slate-400 rounded-full top-0"></div>
                     </div>
                     <div class="ml-3 grow">
                         <p class="font-semibold text-sm md:text-md">{{ user.name }}</p>
-                        <p class="text-gray-500 text-xs">Hello</p>
+                        <!-- <p class="text-gray-500 text-xs">{{ user.message }}</p> -->
                     </div>
                 </div>
                 <!-- <div class="flex p-2 items-center mb-3 cursor-pointer hover:bg-gray-100 rounded-md">

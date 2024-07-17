@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Chat extends Model
 {
@@ -18,4 +19,9 @@ class Chat extends Model
         'deleted_from_sender',
         'deleted_from_receiver',
     ];
+
+    public function user()  
+    {
+        return $this->belongsTo(User::class, 'id', 'sender_id');
+    }
 }

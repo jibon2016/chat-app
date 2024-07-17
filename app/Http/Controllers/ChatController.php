@@ -31,7 +31,6 @@ class ChatController extends Controller
             'sender_id' => auth()->id(),
             'message' => $request->message, 
         ]);
-
         // Broadcast the event for Send Message
         broadcast(new MessageSend($sender, $chat));
 

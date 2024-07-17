@@ -97,7 +97,6 @@ watch( () => props.user, async (newUser) => {
     await axios.get('/chat/' + authUser.id + '/' + user.value.id ).then((res) => {
         chats.value = res.data;
     })
-    console.log(chats);
 }, {deep:true})
 
 
