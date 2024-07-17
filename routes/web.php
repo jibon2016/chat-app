@@ -6,12 +6,16 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Models\Chat;
 use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/rever-start', function () {
+    Artisan::call('reverb:start');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/all-user', [UserController::class, 'getAllUser']);
