@@ -17,18 +17,26 @@ const authStore = useAuthUser();
 //Handle Logout Function
 const logout = (e) =>{
     e.preventDefault();
-    console.log('ok');
+    axios.post('/logout').then((res) => {
+        if(res.data.status === 'success'){
+            authStore.$reset();
+            // window.location.href = '/login';
+            router.push('/login');
+        }
+    }).catch((err) => {
+        console.error(err);
+    });
 };
 
-//Search Filter 
+//Search Filter
 const filterUser = () => {
     if(search.value !== ''){
         return filterUsers.value =  users[0].filter(user => user.name.includes(search.value))
     }
     return filterUsers.value = users[0];
 }
-    
-//Image Linking 
+
+//Image Linking
 function fileLink() {
 return 'https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=50';
 }
@@ -66,8 +74,8 @@ onMounted( async () => {
 
 <template>
 <!-- Header Section -->
-<div class="bg-white border-b border-gray-300 fixed top-0 w-full shadow">
-    <div class="lg:container mx-auto p-4">
+<div class="bg-white border-b border-gray-300 fixed top-0 w-full shadow z-50">
+    <div class="lg:container mx-auto p-4 ">
         <div class="grid grid-cols-3 gap-4">
             <div class="col-span-1 min-w[250px]">
                 <div class="flex items-center justify-between">
@@ -91,7 +99,7 @@ onMounted( async () => {
             </div>
         </div>
     </div>
-</div>  
+</div>
 <!-- Header Section End -->
 <!-- Body Section Start -->
 <div class="mt-[90px] lg:container mx-auto px-4 mb-4 ">
@@ -104,7 +112,7 @@ onMounted( async () => {
             <!--Chat List-->
             <div class="max-h-96 overflow-y-auto" >
                 <div v-for="user in filterUsers" :key="user.id" @click="handleUser(user)" class="flex p-2 items-center mb-3 mr-2 cursor-pointer hover:border hover:border-blue-200 rounded-md" :class="chatUser.id == user.id ? ' bg-blue-100': 'bg-gray-100'">
-                    <div class="relative shrink">
+                    <div class="relative shrink z-10">
                         <img class="rounded-full w-8 h-8 md:w-12 md:h-12" :src="fileLink()">
                         <div class="absolute w-3 h-3 bg-slate-400 rounded-full top-0"></div>
                     </div>
