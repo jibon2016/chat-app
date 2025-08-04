@@ -29,4 +29,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/run-npm', function () {
+    // Only for development use
+    $output = null;
+    $returnVar = null;
+    exec('npm run build', $output, $returnVar); // Replace with your command
+
+    return response()->json([
+        'output' => $output,
+        'status' => $returnVar === 0 ? 'Success' : 'Error',
+    ]);
+});
+
 require __DIR__.'/auth.php';
