@@ -22,7 +22,7 @@ const closeChat = (e) =>{
 
 //Websociket Listen
 
-/* 
+/*
     Join in a one single Channel
     Echo.join('chat.1')
     .here((users) =>{
@@ -37,12 +37,12 @@ const closeChat = (e) =>{
 
 
     channel.listenForWhisper('typing', (event) => {
-        if(event.id == user.value.id){
+        if(event.id === user.value.id){
             typing.value = "Typing..."
         }
     });
     channel.listenForWhisper('typingEnd', (event) => {
-        if(event.id == user.value.id){
+        if(event.id === user.value.id){
             typing.value = '';
         }
     });
@@ -69,7 +69,7 @@ const handleSend = (e) => {
     if (message.value !== '') {
         btnDisable.value = true;
         axios.post('/send-message', {
-            'receiver_id' : user.value.id, 
+            'receiver_id' : user.value.id,
             'message' : message.value,
             'authUser':  authUser.id,
         }).then((res) => {
@@ -157,18 +157,18 @@ const getTime = (time) => {
             <div class="text-center bg-blue-200 mx-auto px-2 py-1 rounded-lg text-xs">Send a Message</div>
         </div>
     </div>
-    
+
     <!-- Chat Footer-->
     <div class="flex items-center bg-white rounded-bl-md rounded-br-md p-4">
         <div class="w-full relative">
             <input type="text" @focus="handleFocus" @focusout="handleFocusOut" v-model="message" @keyup.enter="handleSend" placeholder="Type you message here..." class="w-full p-2 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:border-blue-400">
-            
+
             <div v-if="typing" class="absolute">
                 <span class=" animate-pulse text-[12px] ml-2 text-green-500 ">Typing...</span>
             </div>
         </div>
         <button @click="handleSend" :disabled="btnDisable" class="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-700 ml-2">Send</button>
-        
+
     </div>
-    
+
 </template>
