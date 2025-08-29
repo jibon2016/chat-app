@@ -21,4 +21,4 @@ jobs:
         server: ftp.jibon.dev
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        server-dir: /public_html/chat-app.jibon.dev/
+        server-dir: chat-app.jibon.dev/
